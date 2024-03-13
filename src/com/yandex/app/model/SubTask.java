@@ -1,13 +1,12 @@
-import java.util.Objects;
+package com.yandex.app.model;
 
-class SubTask extends Task {
-    private int idEpic;
+import com.yandex.app.service.*;
 
-    public SubTask(String name, String description, Status status) {
+public class SubTask extends Task {
+    private final int idEpic;
+
+    public SubTask(String name, String description, Status status, int idEpic) {
         super(name, description, status);
-    }
-
-    public void setIdEpic(int idEpic) {
         this.idEpic = idEpic;
     }
 
@@ -20,8 +19,8 @@ class SubTask extends Task {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
         SubTask otherSubTask = (SubTask) obj;
-        return Objects.equals(name, otherSubTask.name) &&
-                Objects.equals(description, otherSubTask.description);
+        // не понимаю как можно тут не переопределять, если нужно привести к типу SubTask
+        return (id == otherSubTask.id);
     }
 
     @Override
