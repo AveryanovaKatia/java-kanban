@@ -11,7 +11,7 @@ public class Main {
         Task task1 = new Task("Приготовить ужин", "Паста и овощной салат", Status.NEW);
         taskManager.putNewTask(task1);
         //поменяла таск
-        Task task2 = new Task("Приготовить ужин", "Паста и овощной салат", Status.DONE);
+        Task task2 = new Task("Приготовить ужин", "Паста и овощной салат", Status.DONE, 1);
         taskManager.updateTask(task2);
 
         //создала второй таск
@@ -28,9 +28,9 @@ public class Main {
         SubTask subTask1 = new SubTask("Сдать все задания", "Успеть до дедлайна",
                 Status.NEW, 3);
         taskManager.putNewSubTask(subTask1);
-        //поменяла статус сабтаска в эпик id 3
+        //поменяла статус сабтаска(4) в эпик id 3
         SubTask subTask4 = new SubTask("Сдать все задания", "Успеть до дедлайна",
-                Status.DONE, 3);
+                Status.DONE, 3, 4);
         taskManager.updateSubTask(subTask4);
 
 

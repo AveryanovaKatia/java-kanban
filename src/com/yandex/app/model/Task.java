@@ -1,6 +1,5 @@
 package com.yandex.app.model;
 
-import com.yandex.app.service.*;
 import java.util.Objects;
 
 public class Task {
@@ -13,6 +12,13 @@ public class Task {
         setName(name);
         setDesc(description);
         setStatus(status);
+    }
+
+    public Task(String name, String description, Status status, int id) {
+        setName(name);
+        setDesc(description);
+        setStatus(status);
+        setId(id);
     }
 
     Task() {

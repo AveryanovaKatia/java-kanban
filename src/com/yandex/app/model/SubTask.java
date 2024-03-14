@@ -1,7 +1,5 @@
 package com.yandex.app.model;
 
-import com.yandex.app.service.*;
-
 public class SubTask extends Task {
     private final int idEpic;
 
@@ -10,17 +8,14 @@ public class SubTask extends Task {
         this.idEpic = idEpic;
     }
 
-    public int getIdEpic() {
-        return idEpic;
+    public SubTask(String name, String description, Status status, int idEpic, int id) {
+        super(name, description, status);
+        this.idEpic = idEpic;
+        setId(id);
     }
 
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        SubTask otherSubTask = (SubTask) obj;
-        // не понимаю как можно тут не переопределять, если нужно привести к типу SubTask
-        return (id == otherSubTask.id);
+    public int getIdEpic() {
+        return idEpic;
     }
 
     @Override
