@@ -47,8 +47,8 @@ public class Main {
         taskManager.putNewSubTask(subTask3);
 
 
-        System.out.println(taskManager.getOllTask());
-        System.out.println(taskManager.getOllEpic());
-        System.out.println(taskManager.getOllSubTask());
+        System.out.println(taskManager.getAllTask());
+        System.out.println(taskManager.getAllEpic());
+        System.out.println(taskManager.getAllSubTask());
     }
 }

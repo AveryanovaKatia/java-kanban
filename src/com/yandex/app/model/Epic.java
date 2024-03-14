@@ -8,10 +8,10 @@ public class Epic extends Task {
     public Epic(String name, String description) {
         setName(name);
         setDesc(description);
-        setStatus(status);
+        setStatus(Status.NEW);
     }
 
-    public void setIdSubTasks(int idSubTask) {
+    public void addIdSubTasks(int idSubTask) {
         idSubTasks.add(idSubTask);
     }
 
@@ -23,7 +23,7 @@ public class Epic extends Task {
         idSubTasks.clear();
     }
 
-    public void deleteSubTask(int idSubTask) {
+    public void deleteSubTask(Integer idSubTask) {
         idSubTasks.remove(idSubTask);
     }
 
