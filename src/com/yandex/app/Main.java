@@ -6,8 +6,11 @@ import com.yandex.app.model.*;
 public class Main {
 
     public static void main(String[] args) {
+
+        Managers managers = new Managers();
+        TaskManager taskManager = managers.getDefault();
+
         //Создала таск
-        TaskManager taskManager = new TaskManager();
         Task task1 = new Task("Приготовить ужин", "Паста и овощной салат", Status.NEW);
         taskManager.putNewTask(task1);
         //поменяла таск
@@ -46,9 +49,21 @@ public class Main {
                 Status.NEW, 5);
         taskManager.putNewSubTask(subTask3);
 
-
+        System.out.println("Задачи:");
         System.out.println(taskManager.getAllTask());
+
+        System.out.println("Эпики:");
         System.out.println(taskManager.getAllEpic());
+
+        System.out.println("Подзадачи:");
         System.out.println(taskManager.getAllSubTask());
+
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getEpicById(3));
+
+        System.out.println(taskManager.getHistory());
+
+        System.out.println(Managers.getDefaultHistory().getHistory());
+
     }
 }
