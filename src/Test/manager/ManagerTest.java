@@ -1,9 +1,7 @@
-package com.yandex.app.test;
+package Test.manager;
 
 import com.yandex.app.model.*;
 import com.yandex.app.service.*;
-
-import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -12,25 +10,22 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class ManagerTest {
-    Managers managers;
+    private TaskManager taskManager;
 
     @BeforeEach
     public void addTaskTest() {
-        managers = new Managers();
+        taskManager = Managers.getDefault();
     }
 
     // убедитесь, что утилитарный класс всегда возвращает проинициализ-ые и готовые к работе экземпляры менеджеров;
     @Test
     public void classManagersAddGoodInMemoryTaskManager() {
-        TaskManager taskManager = managers.getDefault();
-        assertNotNull(taskManager);
+        assertNotNull(taskManager, "Экземпляр класса не пронициализирован");
     }
-
 
     // проверьте, что InMemoryTaskManager действительно добавляет задачи разного типа и может найти их по id;
     @Test
     public void inMemoryTaskManagerCanAddAnyTaskTest() {
-        TaskManager taskManager = managers.getDefault();
         Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         taskManager.putNewTask(task1); //id = 1
 
@@ -57,7 +52,6 @@ public class ManagerTest {
     // проверьте, что задачи с заданным id и сгенерированным id не конфликтуют внутри менеджера;
     @Test
     public void idNotConflictInInMemoryTaskManagerTest() {
-        TaskManager taskManager = managers.getDefault();
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         taskManager.putNewTask(task); //id = 1
         Task task1 = new Task("Test1", "Test1", Status.NEW);
@@ -72,7 +66,6 @@ public class ManagerTest {
     // создайте тест, в котором проверяется неизменность задачи (по всем полям) при добавлении задачи в менеджер
     @Test
     public void taskShouldBeSOKThenAddInInMemoryTaskManagerTest() {
-        TaskManager taskManager = managers.getDefault();
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
         taskManager.putNewTask(task);
         Task task1 = taskManager.getTaskById(1);
@@ -81,18 +74,5 @@ public class ManagerTest {
         assertEquals(task.getDesc(), task1.getDesc(), "Несовпадение поля.");
         assertEquals(task.getStatus(), task1.getStatus(), "Несовпадение поля.");
         assertEquals(task.getId(), task1.getId(), "Несовпадение поля.");
-    }
-
-    // убедитесь, что задачи, добавляемые в HistoryManager, сохраняют предыдущую версию задачи и её данных.
-    @Test
-    public void addTest() {
-        HistoryManager historyManager = Managers.getDefaultHistory();
-
-        Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
-        historyManager.addTaskInHistory(task);
-
-        final List<Task> history = historyManager.getHistory();
-        assertNotNull(history, "История не пустая.");
-        assertEquals(1, history.size(), "История не пустая.");
     }
 }

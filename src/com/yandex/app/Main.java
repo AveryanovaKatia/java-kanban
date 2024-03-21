@@ -6,9 +6,7 @@ import com.yandex.app.model.*;
 public class Main {
 
     public static void main(String[] args) {
-
-        Managers managers = new Managers();
-        TaskManager taskManager = managers.getDefault();
+        TaskManager taskManager = Managers.getDefault();
 
         //Создала таск
         Task task1 = new Task("Приготовить ужин", "Паста и овощной салат", Status.NEW);

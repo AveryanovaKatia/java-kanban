@@ -2,25 +2,25 @@ package com.yandex.app.service;
 
 import com.yandex.app.model.Task;
 
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
-    List<Task> historyManager = new LinkedList<>();
+    private final List<Task> historyManager = new LinkedList<>();
+    private final static int size = 10;
 
     @Override
     public void addTaskInHistory(Task task) {
-      if (historyManager.size() < 10) {
-          historyManager.add(task);
-      } else {
+      if (historyManager.size() == size) {
           historyManager.remove(0);
-          historyManager.add(task);
       }
+      historyManager.add(task);
     }
 
     @Override
     public List<Task> getHistory() {
-        return historyManager;
+        return List.copyOf(historyManager);
     }
 
 

@@ -1,16 +1,19 @@
 package com.yandex.app.service;
 
 import com.yandex.app.model.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
     private int id = 1;
-    private HashMap<Integer, Task> tasks = new HashMap<>();
-    private HashMap<Integer, Epic> epics = new HashMap<>();
-    private HashMap<Integer, SubTask> subTasks = new HashMap<>();
+    private final Map<Integer, Task> tasks = new HashMap<>();
+    private final Map<Integer, Epic> epics = new HashMap<>();
+    private final Map<Integer, SubTask> subTasks = new HashMap<>();
 
-    HistoryManager inMemoryHistoryManager = new InMemoryHistoryManager();
+    private final HistoryManager historyManager = Managers.getDefaultHistory();
 
     // добавть новую задачу
     @Override
@@ -89,38 +92,37 @@ public class InMemoryTaskManager implements TaskManager {
 
     //получить все задачи
     @Override
-    public ArrayList<Task> getAllTask() {
+    public List<Task> getAllTask() {
         return new ArrayList<>(tasks.values());
     }
 
     @Override
-    public ArrayList<Epic> getAllEpic() {
+    public List<Epic> getAllEpic() {
         return new ArrayList<>(epics.values());
     }
 
     @Override
-    public ArrayList<SubTask> getAllSubTask() {
+    public List<SubTask> getAllSubTask() {
         return new ArrayList<>(subTasks.values());
     }
 
     //получить задачу по id
     @Override
     public Task getTaskById(int id) {
-        inMemoryHistoryManager.addTaskInHistory(tasks.get(id));
+        historyManager.addTaskInHistory(tasks.get(id));
         return tasks.get(id);
     }
 
     @Override
     public Epic getEpicById(int id) {
-        inMemoryHistoryManager.addTaskInHistory(epics.get(id));
+        historyManager.addTaskInHistory(epics.get(id));
         return epics.get(id);
     }
 
     @Override
     public SubTask getSubTaskById(int id) {
-        inMemoryHistoryManager.addTaskInHistory(subTasks.get(id));
+        historyManager.addTaskInHistory(subTasks.get(id));
         return subTasks.get(id);
-
     }
 
     //удалить задачу по id
@@ -147,7 +149,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public HistoryManager getHistory() {
-        return inMemoryHistoryManager;
+        return historyManager;
     }
 
 

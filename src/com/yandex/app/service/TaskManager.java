@@ -1,10 +1,7 @@
 package com.yandex.app.service;
 
-import com.yandex.app.model.Epic;
-import com.yandex.app.model.SubTask;
-import com.yandex.app.model.Task;
+import com.yandex.app.model.*;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public interface TaskManager {
@@ -30,11 +27,11 @@ public interface TaskManager {
     void deleteAllSubTask();
 
     //получить все задачи
-    ArrayList<Task> getAllTask();
+    List<Task> getAllTask();
 
-    ArrayList<Epic> getAllEpic();
+    List<Epic> getAllEpic();
 
-    ArrayList<SubTask> getAllSubTask();
+    List<SubTask> getAllSubTask();
 
     //получить задачу по id
     Task getTaskById(int id);
@@ -50,5 +47,6 @@ public interface TaskManager {
 
     void deleteSubTaskById(int id);
 
-    public HistoryManager getHistory();
+    HistoryManager getHistory();
 }
+
