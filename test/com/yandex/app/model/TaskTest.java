@@ -1,6 +1,5 @@
-package Test.task;
+package com.yandex.app.model;
 
-import com.yandex.app.model.*;
 import com.yandex.app.service.*;
 
 import java.util.List;

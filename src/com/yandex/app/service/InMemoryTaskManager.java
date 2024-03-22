@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 
 public class InMemoryTaskManager implements TaskManager {
-    private int id = 1;
+    private int idCount = 1;
     private final Map<Integer, Task> tasks = new HashMap<>();
     private final Map<Integer, Epic> epics = new HashMap<>();
     private final Map<Integer, SubTask> subTasks = new HashMap<>();
@@ -109,8 +109,9 @@ public class InMemoryTaskManager implements TaskManager {
     //получить задачу по id
     @Override
     public Task getTaskById(int id) {
-        historyManager.addTaskInHistory(tasks.get(id));
-        return tasks.get(id);
+        Task task = tasks.get(id);
+        historyManager.addTaskInHistory(task);
+        return task;
     }
 
     @Override
@@ -148,8 +149,8 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     @Override
-    public HistoryManager getHistory() {
-        return historyManager;
+    public List<Task> getHistory() {
+        return historyManager.getHistory();
     }
 
 
@@ -177,7 +178,7 @@ public class InMemoryTaskManager implements TaskManager {
     }
 
     private int makeId() {
-        return id++;
+        return idCount++;
     }
 }
 

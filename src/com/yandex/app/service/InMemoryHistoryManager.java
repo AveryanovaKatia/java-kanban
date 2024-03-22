@@ -8,14 +8,16 @@ import java.util.List;
 
 public class InMemoryHistoryManager implements HistoryManager {
     private final List<Task> historyManager = new LinkedList<>();
-    private final static int size = 10;
+    private final static int SIZE = 10;
 
     @Override
     public void addTaskInHistory(Task task) {
-      if (historyManager.size() == size) {
-          historyManager.remove(0);
-      }
-      historyManager.add(task);
+        if (task != null) {
+            if (historyManager.size() == SIZE) {
+                historyManager.remove(0);
+            }
+            historyManager.add(task);
+        }
     }
 
     @Override

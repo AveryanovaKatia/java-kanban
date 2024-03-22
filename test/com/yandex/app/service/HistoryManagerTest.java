@@ -1,7 +1,6 @@
-package Test.manager;
+package com.yandex.app.service;
 
 import com.yandex.app.model.*;
-import com.yandex.app.service.*;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
