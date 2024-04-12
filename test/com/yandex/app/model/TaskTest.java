@@ -38,4 +38,19 @@ public class TaskTest {
         assertEquals(1, tasks.size(), "Неверное количество задач.");
         assertEquals(task1, tasks.get(0), "Задачи не совпадают.");
     }
+
+    @Test
+    public void setMetodsTest() {
+        Task task1 = new Task("Test1", "Test addNewTask description", Status.NEW);
+        taskManager.putNewTask(task1);
+        task1.setName("TestNoTest");
+        task1.setDesc("DescNoDesc");
+        task1.setStatus(Status.DONE);
+        task1.setId(123);
+
+        assertEquals("TestNoTest", task1.getName(), "Изменения сохранены");
+        assertEquals("DescNoDesc", task1.getDesc(), "Изменения сохранены");
+        assertEquals(Status.DONE, task1.getStatus(), "Изменения сохранены");
+        assertEquals(123, task1.getId(), "Изменения сохранены");
+    }
 }
