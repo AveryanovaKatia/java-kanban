@@ -25,7 +25,7 @@ public class HistoryManagerTest {
         historyManager.addTaskInHistory(task);
         historyManager.addTaskInHistory(task2);
 
-        final List<Task> history = historyManager.getHistorys();
+        final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(2, history.size(), "История не пустая.");
     }
@@ -42,7 +42,7 @@ public class HistoryManagerTest {
         historyManager.addTaskInHistory(task1);
         historyManager.addTaskInHistory(task3);
 
-        final List<Task> history = historyManager.getHistorys();
+        final List<Task> history = historyManager.getHistory();
         assertNotNull(history, "История не пустая.");
         assertEquals(3, history.size(), "В истории нет повторения.");
     }
@@ -59,7 +59,7 @@ public class HistoryManagerTest {
         historyManager.addTaskInHistory(task3);
         historyManager.addTaskInHistory(task4);
 
-        final List<Task> history = historyManager.getHistorys();
+        final List<Task> history = historyManager.getHistory();
 
         assertEquals(task1, history.get(0), "Задачи хранятся в порядке добавления.");
         assertEquals(task2, history.get(1), "Задачи хранятся в порядке добавления.");
