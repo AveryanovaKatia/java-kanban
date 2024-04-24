@@ -28,8 +28,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         List<Task> list = new ArrayList<>();
         Node<Task> newNode = head;
         while (newNode != null) {
-            list.add(newNode.data);
-            newNode = newNode.next;
+            list.add(newNode.getData());
+            newNode = newNode.getNext();
         }
         return list;
     }
@@ -46,18 +46,18 @@ public class InMemoryHistoryManager implements HistoryManager {
     private void removeNode(Node<Task> node) {
         //удаляет узел из связанного списка +
         if (node.equals(head)) {
-            Node<Task> newHead = head.next;
-            newHead.prev = null;
+            Node<Task> newHead = head.getNext();
+            newHead.setPrev(null);
             head = newHead;
         } else if (node.equals(tail)) {
-            Node<Task> newTail = tail.prev;
-            newTail.next = null;
+            Node<Task> newTail = tail.getPrev();
+            newTail.setNext(null);
             tail = newTail;
         } else {
-            Node<Task> tempNext = node.next;
-            Node<Task> tempPrev = node.prev;
-            tempNext.prev = tempPrev;
-            tempPrev.next = tempNext;
+            Node<Task> tempNext = node.getNext();
+            Node<Task> tempPrev = node.getPrev();
+            tempNext.setPrev(tempPrev);
+            tempPrev.setNext(tempNext);
         }
     }
 
@@ -68,12 +68,12 @@ public class InMemoryHistoryManager implements HistoryManager {
             return head;
         } else if (tail == null) {
             tail = new Node<>(task, null, head);
-            head.next = tail;
+            head.setNext(tail);
             return tail;
         } else {
             final Node<Task> oldTail = tail;
             final Node<Task> newNode = new Node<>(task, null, oldTail);
-            oldTail.next = newNode;
+            oldTail.setNext(newNode);
             tail = newNode;
             return newNode;
         }

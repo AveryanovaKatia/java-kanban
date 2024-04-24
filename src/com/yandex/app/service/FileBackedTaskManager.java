@@ -7,9 +7,8 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.List;
 
-
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
-    final File file;
+    private final File file;
 
     public FileBackedTaskManager(File file) {
         this.file = file;
@@ -47,7 +46,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
 
     //восстанавливает данные менеджера из файла при запуске программы
     public static FileBackedTaskManager loadFromFile(File file) throws IOException {
-        FileBackedTaskManager fbtm = new FileBackedTaskManager(file);
+        FileBackedTaskManager fileBackedTaskManager = new FileBackedTaskManager(file);
 
         String fr = Files.readString(file.toPath());
         String[] lines = fr.split(";");
@@ -61,31 +60,31 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
                 String[] str = line.split(",");
                 if (str[1].equals(TipeTask.TASK.toString())) {
                     Task task = fromStringTask(line);
-                    fbtm.tasks.put(task.getId(), task);
+                    fileBackedTaskManager.tasks.put(task.getId(), task);
                 } else if (str[1].equals(TipeTask.EPIC.toString())) {
                     Epic epic = fromStringEpic(line);
-                    fbtm.epics.put(epic.getId(), epic);
+                    fileBackedTaskManager.epics.put(epic.getId(), epic);
                 } else {
                     SubTask subTask = fromStringSubTask(line);
-                    fbtm.subTasks.put(subTask.getId(), subTask);
+                    fileBackedTaskManager.subTasks.put(subTask.getId(), subTask);
                 }
             }
         }
 
-        for (int i : fbtm.tasks.keySet()) {
+        for (int i : fileBackedTaskManager.tasks.keySet()) {
             if (idCount < i) {
                 idCount = i;
             }
         }
 
-        for (int i : fbtm.epics.keySet()) {
+        for (int i : fileBackedTaskManager.epics.keySet()) {
             if (idCount < i) {
                 idCount = i;
             }
         }
 
-        for (SubTask subTask : fbtm.subTasks.values()) {
-            final Epic epic = fbtm.epics.get(subTask.getIdEpic());
+        for (SubTask subTask : fileBackedTaskManager.subTasks.values()) {
+            final Epic epic = fileBackedTaskManager.epics.get(subTask.getIdEpic());
             int id = subTask.getId();
             epic.addIdSubTasks(id);
             if (idCount < id) {
@@ -93,8 +92,8 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
             }
         }
 
-        fbtm.idCount = idCount;
-        return fbtm;
+        fileBackedTaskManager.idCount = idCount;
+        return fileBackedTaskManager;
     }
 
     // Преобразовывает задачу в строку
@@ -128,7 +127,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         String[] str = value.split(",");
         return new SubTask(str[2], str[3], Status.valueOf(str[4]), Integer.parseInt(str[5]), Integer.parseInt(str[0]));
     }
-
 
     @Override
     public void putNewTask(Task task) {

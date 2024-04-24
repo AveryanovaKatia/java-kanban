@@ -15,15 +15,12 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class FileBackedTaskManagerTest {
     private static File file;
-    private static FileBackedTaskManager fbtm;
-
-    public FileBackedTaskManagerTest() {
-    }
+    private static FileBackedTaskManager fileBackedTaskManager;
 
     @BeforeEach
     public void addTaskTest() throws IOException {
         file = File.createTempFile("test", "txt");
-        fbtm = new FileBackedTaskManager(file);
+        fileBackedTaskManager = new FileBackedTaskManager(file);
     }
 
     @Test
@@ -44,14 +41,14 @@ public class FileBackedTaskManagerTest {
     @Test
     public void writeTasksInFileTest() throws IOException {
         Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
-        fbtm.putNewTask(task1); //id = 1
+        fileBackedTaskManager.putNewTask(task1); //id = 1
 
         Epic epic1 = new Epic("Test addNewEpic", "Test addNewEpic description");
-        fbtm.putNewEpic(epic1); //id = 2
+        fileBackedTaskManager.putNewEpic(epic1); //id = 2
 
         SubTask subTask1 = new SubTask("Test addNewSubTask", "Test addNewSubTask description",
                 Status.NEW, 2); //id = 3
-        fbtm.putNewSubTask(subTask1);
+        fileBackedTaskManager.putNewSubTask(subTask1);
 
         String fr = Files.readString(file.toPath());
         String[] lines = fr.split(";");
@@ -68,15 +65,15 @@ public class FileBackedTaskManagerTest {
     @Test
     public void writeAndDeleteTasksInFileTest() throws IOException {
         Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
-        fbtm.putNewTask(task1); //id = 1
+        fileBackedTaskManager.putNewTask(task1); //id = 1
 
         Task task2 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
-        fbtm.putNewTask(task2); //id = 2
-        fbtm.deleteTaskById(2);
+        fileBackedTaskManager.putNewTask(task2); //id = 2
+        fileBackedTaskManager.deleteTaskById(2);
 
         Epic epic1 = new Epic("Test addNewEpic", "Test addNewEpic description");
-        fbtm.putNewEpic(epic1); //id = 3
-        fbtm.deleteAllEpic();
+        fileBackedTaskManager.putNewEpic(epic1); //id = 3
+        fileBackedTaskManager.deleteAllEpic();
 
         FileBackedTaskManager f = FileBackedTaskManager.loadFromFile(file);
 
@@ -88,15 +85,15 @@ public class FileBackedTaskManagerTest {
     @Test
     public void fillingIDSubTaskInEpicTest() throws IOException {
         Epic epic1 = new Epic("Test addNewEpic", "Test addNewEpic description");
-        fbtm.putNewEpic(epic1); //id = 1
+        fileBackedTaskManager.putNewEpic(epic1); //id = 1
 
         SubTask subTask1 = new SubTask("Test addNewSubTask1", "Test",
                 Status.NEW, 1); //id = 2
-        fbtm.putNewSubTask(subTask1);
+        fileBackedTaskManager.putNewSubTask(subTask1);
 
         SubTask subTask2 = new SubTask("Test addNewSubTask2", "Test",
                 Status.NEW, 1); //id = 3
-        fbtm.putNewSubTask(subTask2);
+        fileBackedTaskManager.putNewSubTask(subTask2);
 
         FileBackedTaskManager f = FileBackedTaskManager.loadFromFile(file);
         Epic epic = f.getEpicById(1);
