@@ -39,13 +39,21 @@ public class Main {
         Epic epic2 = new Epic("Найти работу", "Очень важно!");
         taskManager.putNewEpic(epic2);
 
-        //добавила два сабтаска в эпик id 5
+        //добавила три сабтаска в эпик id 5
         SubTask subTask2 = new SubTask("Составить резюме", "Согласно рекомндациям",
                 Status.NEW, 5);
         taskManager.putNewSubTask(subTask2);
-        SubTask subTask3 = new SubTask("Пройти собеседование", "Все получится!",
+        SubTask subTask3 = new SubTask("Повторить изученное", "Набраться храбрости!",
                 Status.NEW, 5);
         taskManager.putNewSubTask(subTask3);
+        SubTask subTask5 = new SubTask("Пройти собеседование", "Все получится!",
+                Status.NEW, 5);
+        taskManager.putNewSubTask(subTask5);
+
+        //создала третий эпик id 9 без сабтасков
+        Epic epic3 = new Epic("Тестирование", "Для истории");
+        taskManager.putNewEpic(epic3);
+
 
         System.out.println("Задачи:");
         System.out.println(taskManager.getAllTask());
@@ -55,13 +63,26 @@ public class Main {
 
         System.out.println("Подзадачи:");
         System.out.println(taskManager.getAllSubTask());
+        System.out.println();
 
         System.out.println(taskManager.getTaskById(1));
-        System.out.println(taskManager.getEpicById(3));
+        System.out.println(taskManager.getTaskById(2));
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getEpicById(5));
+        System.out.println(taskManager.getTaskById(1));
+        System.out.println(taskManager.getSubTaskById(7));
+        System.out.println(taskManager.getSubTaskById(6));
+        System.out.println(taskManager.getEpicById(9));
+        System.out.println(taskManager.getEpicById(9));
 
         System.out.println(taskManager.getHistory());
 
-        System.out.println(Managers.getDefaultHistory().getHistory());
+        taskManager.deleteTaskById(1);
 
+        System.out.println(taskManager.getHistory());
+
+        taskManager.deleteAllSubTask();
+
+        System.out.println(taskManager.getHistory());
     }
 }
