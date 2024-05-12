@@ -1,10 +1,13 @@
 package com.yandex.app.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Epic extends Task {
     private final List<Integer> idSubTasks = new ArrayList<>();
+    private LocalDateTime endTime;
 
     public Epic(String name, String description) {
         setName(name);
@@ -12,8 +15,14 @@ public class Epic extends Task {
         setStatus(Status.NEW);
     }
 
-    public Epic(String name, String description, Status status, int id) {
-        super(name, description, status, id);
+    public Epic(String name, String description, int id) {
+        setName(name);
+        setDesc(description);
+        setId(id);
+    }
+
+    public Epic(String name, String description, Status status, String duration, LocalDateTime startTime, int id) {
+        super(name, description, status, duration, startTime, id);
     }
 
     public void addIdSubTasks(int idSubTask) {
@@ -30,6 +39,18 @@ public class Epic extends Task {
 
     public void deleteSubTask(Integer idSubTask) {
         idSubTasks.remove(idSubTask);
+    }
+
+    public void setEndTimeEpic(LocalDateTime endTime) {
+        this.endTime = endTime;
+    }
+
+    public LocalDateTime getEndTimeEpic() {
+        return endTime;
+    }
+
+    public void setDurationEpic(Duration duration) {
+        this.duration = duration;
     }
 
     @Override

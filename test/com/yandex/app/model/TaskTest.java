@@ -2,6 +2,7 @@ package com.yandex.app.model;
 
 import com.yandex.app.service.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -14,19 +15,21 @@ public class TaskTest {
     private TaskManager taskManager;
 
     @BeforeEach
-    public void addTaskTest() {
+    public void createTest() {
         taskManager = Managers.getDefault();
     }
 
-    // проверьте, что экземпляры класса Task равны друг другу, если равен их id;
+    // экземпляры класса Task равны друг другу, если равен их id;
     @Test
     public void twoTasksEqualsIfEqualsTheirIdTest() {
-        Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW);
+        Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW,
+                "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         taskManager.putNewTask(task1);
 
         final int id = task1.getId();
 
-        Task task2 = new Task("Test1", "Test2", Status.IN_PROGRESS, id);
+        Task task2 = new Task("Test1", "Test2", Status.IN_PROGRESS,
+                "PT1H30M", LocalDateTime.of(2024, 1, 1, 2, 0), id);
         taskManager.updateTask(task2);
 
         assertNotNull(task2, "Задача не найдена.");
@@ -40,17 +43,18 @@ public class TaskTest {
     }
 
     @Test
-    public void setMetodsTest() {
-        Task task1 = new Task("Test1", "Test addNewTask description", Status.NEW);
+    public void setFotTaskTest() {
+        Task task1 = new Task("Test1", "Test addNewTask description", Status.NEW,
+                "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         taskManager.putNewTask(task1);
         task1.setName("TestNoTest");
         task1.setDesc("DescNoDesc");
         task1.setStatus(Status.DONE);
         task1.setId(123);
 
-        assertEquals("TestNoTest", task1.getName(), "Изменения сохранены");
-        assertEquals("DescNoDesc", task1.getDesc(), "Изменения сохранены");
-        assertEquals(Status.DONE, task1.getStatus(), "Изменения сохранены");
-        assertEquals(123, task1.getId(), "Изменения сохранены");
+        assertEquals("TestNoTest", task1.getName(), "Изменения не сохранены");
+        assertEquals("DescNoDesc", task1.getDesc(), "Изменения не сохранены");
+        assertEquals(Status.DONE, task1.getStatus(), "Изменения не сохранены");
+        assertEquals(123, task1.getId(), "Изменения не сохранены");
     }
 }
