@@ -2,9 +2,14 @@ package com.yandex.app.service;
 
 import com.yandex.app.model.*;
 
+import java.time.format.DateTimeFormatter;
+
 import java.util.List;
+import java.util.TreeSet;
 
 public interface TaskManager {
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy_HH:mm");
+
     // добавть новую задачу
     void putNewTask(Task task);
 
@@ -48,5 +53,7 @@ public interface TaskManager {
     void deleteSubTaskById(int id);
 
     List<Task> getHistory();
+
+    TreeSet<Task> getPrioritizedTasks();
 }
 

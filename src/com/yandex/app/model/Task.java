@@ -1,5 +1,7 @@
 package com.yandex.app.model;
 
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.Objects;
 
 public class Task {
@@ -7,21 +9,35 @@ public class Task {
     protected String name;
     protected String description;
     protected Status status;
+    protected Duration duration;
+    protected LocalDateTime startTime;
 
-    public Task(String name, String description, Status status) {
+    public Task(String name, String description, Status status, String duration, LocalDateTime startTime) {
         setName(name);
         setDesc(description);
         setStatus(status);
+        setDuration(duration);
+        setStartTime(startTime);
     }
 
-    public Task(String name, String description, Status status, int id) {
+    public Task(String name, String description, Status status, String duration, LocalDateTime startTime, int id) {
         setName(name);
         setDesc(description);
         setStatus(status);
+        setDuration(duration);
+        setStartTime(startTime);
         setId(id);
     }
 
     Task() {
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getId() {
+        return id;
     }
 
     public void setName(String name) {
@@ -48,12 +64,28 @@ public class Task {
         return status;
     }
 
-    public int getId() {
-        return id;
+    public void setDuration(String duration) {
+        if (duration.equals("null")) {
+            this.duration = null;
+        } else {
+            this.duration = Duration.parse(duration);
+        }
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public Duration getDuration() {
+        return duration;
+    }
+
+    public void setStartTime(LocalDateTime startTime) {
+        this.startTime = startTime;
+    }
+
+    public LocalDateTime getStartTime() {
+        return startTime;
+    }
+
+    public LocalDateTime getEndTime() {
+        return startTime.plus(duration);
     }
 
     @Override

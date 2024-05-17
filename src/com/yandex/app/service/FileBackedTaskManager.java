@@ -4,8 +4,10 @@ import com.yandex.app.model.*;
 import java.io.*;
 import java.nio.file.Files;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class FileBackedTaskManager extends InMemoryTaskManager implements TaskManager {
     private final File file;
@@ -14,28 +16,16 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         this.file = file;
     }
 
+    //сохраняет текущее состояние менеджера в файл
     private void save() {
-        //сохраняет текущее состояние менеджера в файл
         List<String> listAllTask = new ArrayList<>();
 
-        if (tasks.size() > 0) {
-            for (Task task : tasks.values()) {
-                listAllTask.add(convertToString(task));
-            }
-        }
-        if (epics.size() > 0) {
-            for (Epic epic : epics.values()) {
-                listAllTask.add(convertToString(epic));
-            }
-        }
-        if (subTasks.size() > 0) {
-            for (SubTask subTask : subTasks.values()) {
-                listAllTask.add(convertToString(subTask));
-            }
-        }
+        tasks.values().stream().map(this::convertToString).forEach(listAllTask::add);
+        epics.values().stream().map(this::convertToString).forEach(listAllTask::add);
+        subTasks.values().stream().map(this::convertToString).forEach(listAllTask::add);
 
         try (FileWriter writer = new FileWriter(file)) {
-            writer.write("id,type,name,description,status,epic;");
+            writer.write("id,type,name,description,status,startTime,duration,epic;");
             for (String line : listAllTask) {
                 writer.write(line);
             }
@@ -93,39 +83,78 @@ public class FileBackedTaskManager extends InMemoryTaskManager implements TaskMa
         }
 
         fileBackedTaskManager.idCount = idCount;
+
+        for (Epic epic : fileBackedTaskManager.epics.values()) {
+            Optional<LocalDateTime> optional = epic.getIdSubTasks().stream()
+                    .map(fileBackedTaskManager.subTasks::get)
+                    .map(Task::getEndTime)
+                    .max(LocalDateTime::compareTo);
+            optional.ifPresentOrElse(
+                    LocalDateTime -> epic.setEndTimeEpic(optional.get()),
+                    () -> epic.setEndTimeEpic(null)
+            );
+        }
         return fileBackedTaskManager;
     }
 
     // Преобразовывает задачу в строку
     private String convertToString(Task task) {
-        return task.getId() + "," + TipeTask.TASK + "," + task.getName() + "," + task.getDesc() + ","
-                + task.getStatus() + ";";
+        return task.getId() + "," +
+                TipeTask.TASK + "," +
+                task.getName() + "," +
+                task.getDesc() + "," +
+                task.getStatus() + "," +
+                task.getDuration().toString() + "," +
+                task.getStartTime().format(formatter) + ";";
     }
 
     private String convertToString(Epic epic) {
-        return epic.getId() + "," + TipeTask.EPIC + "," + epic.getName() + "," + epic.getDesc() + ","
-                + epic.getStatus() + ";";
+        if (epic.getIdSubTasks().size() == 0) {
+            return epic.getId() + "," +
+                    TipeTask.EPIC + "," +
+                    epic.getName() + "," +
+                    epic.getDesc() + "," +
+                    epic.getStatus() + ",null,null;";
+        } else {
+            return epic.getId() + "," +
+                    TipeTask.EPIC + "," +
+                    epic.getName() + "," +
+                    epic.getDesc() + "," +
+                    epic.getStatus() + "," +
+                    epic.getDuration().toString() + "," +
+                    epic.getStartTime().format(formatter) + ";";
+        }
     }
 
     private String convertToString(SubTask subTask) {
-        return subTask.getId() + "," + TipeTask.SUBTASK + "," + subTask.getName() + "," + subTask.getDesc() + ","
-                + subTask.getStatus() + "," + subTask.getIdEpic() + ";";
+        return subTask.getId() + "," +
+                TipeTask.SUBTASK + "," +
+                subTask.getName() + "," +
+                subTask.getDesc() + "," +
+                subTask.getStatus() + "," +
+                subTask.getDuration().toString() + "," +
+                subTask.getStartTime().format(formatter) + "," +
+                subTask.getIdEpic() + ";";
     }
 
     // Преобразовывает строку в задачу
     private static Task fromStringTask(String value) {
         String[] str = value.split(",");
-        return new Task(str[2], str[3], Status.valueOf(str[4]), Integer.parseInt(str[0]));
+        LocalDateTime startTime = LocalDateTime.parse(str[6], formatter);
+        return new Task(str[2], str[3], Status.valueOf(str[4]), str[5], startTime, Integer.parseInt(str[0]));
     }
 
     private static Epic fromStringEpic(String value) {
         String[] str = value.split(",");
-        return new Epic(str[2], str[3], Status.valueOf(str[4]), Integer.parseInt(str[0]));
+        LocalDateTime startTime = LocalDateTime.parse(str[6], formatter);
+        return new Epic(str[2], str[3], Status.valueOf(str[4]), str[5], startTime, Integer.parseInt(str[0]));
     }
 
     private static SubTask fromStringSubTask(String value) {
         String[] str = value.split(",");
-        return new SubTask(str[2], str[3], Status.valueOf(str[4]), Integer.parseInt(str[5]), Integer.parseInt(str[0]));
+        LocalDateTime startTime = LocalDateTime.parse(str[6], formatter);
+        return new SubTask(str[2], str[3], Status.valueOf(str[4]), str[5], startTime,
+                Integer.parseInt(str[7]), Integer.parseInt(str[0]));
     }
 
     @Override

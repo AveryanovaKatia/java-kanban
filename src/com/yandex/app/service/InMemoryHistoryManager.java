@@ -12,19 +12,21 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void addTaskInHistory(Task task) {
-        // добаляет новую запись в хешмап +
-        int id = task.getId();
-        if (!historyMap.isEmpty()) {
-            if (historyMap.containsKey(id)) {
-                removeTaskFromHistory(id);
+        // добаляет новую запись в хешмап
+        if (task != null) {
+            int id = task.getId();
+            if (!historyMap.isEmpty()) {
+                if (historyMap.containsKey(id)) {
+                    removeTaskFromHistory(id);
+                }
             }
+            historyMap.put(id, linkLast(task));
         }
-        historyMap.put(id, linkLast(task));
     }
 
     @Override
     public List<Task> getHistory() {
-        //собирает все задачи в обычный ArrayList +
+        //собирает все задачи в обычный ArrayList
         List<Task> list = new ArrayList<>();
         Node<Task> newNode = head;
         while (newNode != null) {
@@ -36,7 +38,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
     @Override
     public void removeTaskFromHistory(int id) {
-        //удаляет задачу из приложения и истории +
+        //удаляет задачу из приложения и истории
         if (historyMap.containsKey(id)) {
             removeNode(historyMap.get(id));
             historyMap.remove(id);
@@ -44,7 +46,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private void removeNode(Node<Task> node) {
-        //удаляет узел из связанного списка +
+        //удаляет узел из связанного списка
         if (node.equals(head)) {
             Node<Task> newHead = head.getNext();
             newHead.setPrev(null);
@@ -62,7 +64,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
     private Node<Task> linkLast(Task task) {
-        //добавляет задачу в конец двусвязанного списка +
+        //добавляет задачу в конец двусвязанного списка
         if (head == null) {
             head = new Node<>(task, null, null);
             return head;
