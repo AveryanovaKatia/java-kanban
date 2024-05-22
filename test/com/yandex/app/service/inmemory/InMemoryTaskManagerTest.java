@@ -1,7 +1,10 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
 import com.yandex.app.model.*;
 
+import com.yandex.app.service.Managers;
+import com.yandex.app.service.TaskManagerTest;
+import com.yandex.app.service.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +27,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     // InMemoryTaskManager действительно добавляет задачи разного типа и может найти их по id;
     @Test
-    public void inMemoryTaskManagerCanAddAnyTaskTest() {
+    public void inMemoryTaskManagerCanAddAnyTaskTest() throws NotFoundException {
         Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         manager.putNewTask(task1); //id = 1
@@ -69,7 +72,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     // неизменность задачи (по всем полям) при добавлении задачи в менеджер
     @Test
-    public void taskShouldBeSOKThenAddInInMemoryTaskManagerTest() {
+    public void taskShouldBeSOKThenAddInInMemoryTaskManagerTest() throws NotFoundException {
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         manager.putNewTask(task);
@@ -110,7 +113,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         assertEquals(Status.IN_PROGRESS, manager.getAllEpic().get(0).getStatus(),
                 "Статус эпика расчитан неверно.");
 
-        manager.putNewSubTask(subTask3);
+//        manager.putNewSubTask(subTask3);
+//        так же пересечение
 
         assertEquals(Status.IN_PROGRESS, manager.getAllEpic().get(0).getStatus(),
                 "Статус эпика расчитан неверно.");

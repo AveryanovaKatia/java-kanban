@@ -1,7 +1,7 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
-import com.yandex.app.model.Node;
 import com.yandex.app.model.Task;
+import com.yandex.app.service.HistoryManager;
 
 import java.util.*;
 
@@ -15,10 +15,8 @@ public class InMemoryHistoryManager implements HistoryManager {
         // добаляет новую запись в хешмап
         if (task != null) {
             int id = task.getId();
-            if (!historyMap.isEmpty()) {
-                if (historyMap.containsKey(id)) {
+            if (!historyMap.isEmpty() && historyMap.containsKey(id)) {
                     removeTaskFromHistory(id);
-                }
             }
             historyMap.put(id, linkLast(task));
         }
@@ -78,6 +76,51 @@ public class InMemoryHistoryManager implements HistoryManager {
             oldTail.setNext(newNode);
             tail = newNode;
             return newNode;
+        }
+    }
+
+    private static class Node<T extends Task> {
+        private final T data;
+        private Node<T> next;
+        private Node<T> prev;
+
+        public Node(T data, Node<T> next, Node<T> prev) {
+            this.data = data;
+            setNext(next);
+            setPrev(prev);
+        }
+
+        public T getData() {
+            return data;
+        }
+
+        public Node<T> getNext() {
+            return next;
+        }
+
+        public void setNext(Node<T> next) {
+            this.next = next;
+        }
+
+        public Node<T> getPrev() {
+            return prev;
+        }
+
+        public void setPrev(Node<T> prev) {
+            this.prev = prev;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (!(o instanceof Node)) return false;
+            Node<?> node = (Node<?>) o;
+            return data.equals(node.data) && Objects.equals(next, node.next) && Objects.equals(prev, node.prev);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(data, next, prev);
         }
     }
 }

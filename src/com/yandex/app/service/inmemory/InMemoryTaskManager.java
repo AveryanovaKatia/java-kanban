@@ -1,6 +1,11 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
 import com.yandex.app.model.*;
+import com.yandex.app.service.HistoryManager;
+import com.yandex.app.service.Managers;
+import com.yandex.app.service.TaskManager;
+import com.yandex.app.service.exception.IntersectionException;
+import com.yandex.app.service.exception.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -22,6 +27,8 @@ public class InMemoryTaskManager implements TaskManager {
             int id = makeId();
             task.setId(id);
             tasks.put(id, task);
+        } else {
+            throw new IntersectionException("Задача пересекается по времени с уже добавленными");
         }
     }
 
@@ -43,6 +50,8 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.addIdSubTasks(id);
                 updateEpicFields(epic);
             }
+        } else {
+            throw new IntersectionException("Задача пересекается по времени с уже добавленными");
         }
     }
 
@@ -56,6 +65,7 @@ public class InMemoryTaskManager implements TaskManager {
                 tasks.put(id, task);
             } else {
                 tasks.put(id, oldTask);
+                throw new IntersectionException("Задача пересекается по времени с уже добавленными");
             }
         }
     }
@@ -83,6 +93,7 @@ public class InMemoryTaskManager implements TaskManager {
             } else {
                 subTasks.put(id, oldSubTask);
                 updateEpicFields(epic);
+                throw new IntersectionException("Задача пересекается по времени с уже добавленными");
             }
         }
     }
@@ -130,24 +141,33 @@ public class InMemoryTaskManager implements TaskManager {
 
     //получить задачу по id
     @Override
-    public Task getTaskById(int id) {
-        Task task = tasks.get(id);
-        historyManager.addTaskInHistory(task);
-        return task;
+    public Task getTaskById(int id) throws NotFoundException {
+        if (tasks.containsKey(id)) {
+            Task task = tasks.get(id);
+            historyManager.addTaskInHistory(task);
+            return task;
+        }
+        throw new NotFoundException(id + " не соответсвует не одной из созданных задач");
     }
 
     @Override
     public Epic getEpicById(int id) {
-        Task task = epics.get(id);
-        historyManager.addTaskInHistory(task);
-        return epics.get(id);
+        if (epics.containsKey(id)) {
+            Task task = epics.get(id);
+            historyManager.addTaskInHistory(task);
+            return epics.get(id);
+        }
+        throw new NotFoundException(id + "не соответсвует не одномн из созданных Эпиков");
     }
 
     @Override
     public SubTask getSubTaskById(int id) {
+        if (subTasks.containsKey(id)) {
         Task task = subTasks.get(id);
         historyManager.addTaskInHistory(task);
         return subTasks.get(id);
+    }
+        throw new NotFoundException(id + " не соответсвует не одной из созданных задач");
     }
 
     //удалить задачу по id

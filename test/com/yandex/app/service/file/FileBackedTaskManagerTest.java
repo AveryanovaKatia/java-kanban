@@ -1,7 +1,8 @@
-package com.yandex.app.service;
+package com.yandex.app.service.file;
 
 import com.yandex.app.model.*;
 
+import com.yandex.app.service.TaskManagerTest;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -15,7 +16,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
-public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager>{
+public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskManager> {
     private static File file;
 
     @BeforeEach
@@ -81,8 +82,8 @@ public class FileBackedTaskManagerTest extends TaskManagerTest<FileBackedTaskMan
 
         FileBackedTaskManager f = FileBackedTaskManager.loadFromFile(file);
 
-        assertEquals(1, f.tasks.size(), "Задачи удаляютя неверно");
-        assertEquals(0, f.epics.size(), "Задачи удаляютя неверно");
+        assertEquals(1, f.getAllTask().size(), "Задачи удаляютя неверно");
+        assertEquals(0, f.getAllEpic().size(), "Задачи удаляютя неверно");
 
     }
 

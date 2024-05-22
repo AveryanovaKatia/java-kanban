@@ -1,7 +1,9 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
 import com.yandex.app.model.*;
 
+import com.yandex.app.service.HistoryManager;
+import com.yandex.app.service.Managers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -11,7 +13,7 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
-public class HistoryManagerTest {
+public class InMemoryHistoryManagerTest {
     private HistoryManager historyManager;
 
     @BeforeEach
