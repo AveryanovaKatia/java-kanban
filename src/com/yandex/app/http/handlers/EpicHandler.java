@@ -72,6 +72,7 @@ public class EpicHandler extends BaseHttpHandler {
                 } else {
                     sendNotFound(exchange, "не был передан id для удаления");
                 }
+                break;
             default:
                 sendNotFound(exchange, "Такого эндпоинта нет");
         }

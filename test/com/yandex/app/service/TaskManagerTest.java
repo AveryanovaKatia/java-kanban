@@ -1,6 +1,7 @@
 package com.yandex.app.service;
 
 import com.yandex.app.model.*;
+import com.yandex.app.service.exception.IntersectionException;
 import com.yandex.app.service.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -49,13 +50,14 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task task6 = new Task("Test Task6", "Test", Status.NEW, "PT1H30M",
                 LocalDateTime.of(2023, 12, 31, 23, 10));
 
-//        manager.putNewTask(task3);
-//        manager.putNewTask(task4);
-//        manager.putNewTask(task5);
-//        manager.putNewTask(task6);
-//        раньше у меня задачи просто не добовлялись и так я понимала что проверка на интервалы работает.
-//        Теперь выскакивает исключение и я не знаю как его корректно обработать в тесте
-
+        assertThrows(IntersectionException.class, () -> {manager.putNewTask(task3);},
+                "Не работает проверка на пересечение по времени");
+        assertThrows(IntersectionException.class, () -> {manager.putNewTask(task4);},
+                "Не работает проверка на пересечение по времени");
+        assertThrows(IntersectionException.class, () -> {manager.putNewTask(task5);},
+                "Не работает проверка на пересечение по времени");
+        assertThrows(IntersectionException.class, () -> {manager.putNewTask(task6);},
+                "Не работает проверка на пересечение по времени");
 
         int size = manager.getAllTask().size();
 
@@ -93,9 +95,11 @@ public abstract class TaskManagerTest<T extends TaskManager> {
                 LocalDateTime.of(2024, 1, 1, 4, 10), 1);
         SubTask subTask4 = new SubTask("Test SubTask2", "Test", Status.NEW, "PT2H10M",
                 LocalDateTime.of(2024, 1, 1, 5, 50), 1);
-//        manager.putNewSubTask(subTask3);
-//        manager.putNewSubTask(subTask4);
-//        так же как с таской
+
+        assertThrows(IntersectionException.class, () -> {manager.putNewSubTask(subTask3);},
+                "Не работает проверка на пересечение по времени");
+        assertThrows(IntersectionException.class, () -> {manager.putNewSubTask(subTask4);},
+                "Не работает проверка на пересечение по времени");
 
         assertEquals(2, manager.getAllSubTask().size(), "Проверка на интервалы не срабатывает");
     }

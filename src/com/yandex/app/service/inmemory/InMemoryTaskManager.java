@@ -23,7 +23,7 @@ public class InMemoryTaskManager implements TaskManager {
     // добавть новую задачу
     @Override
     public void putNewTask(Task task) {
-        if (!intersection(task)) {
+        if (!intersectionTaskTime(task)) {
             int id = makeId();
             task.setId(id);
             tasks.put(id, task);
@@ -41,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void putNewSubTask(SubTask subTask) {
-        if (!intersection(subTask)) {
+        if (!intersectionTaskTime(subTask)) {
             Epic epic = epics.get(subTask.getIdEpic());
             if (epic != null) {
                 int id = makeId();
@@ -61,7 +61,7 @@ public class InMemoryTaskManager implements TaskManager {
         int id = task.getId();
         if (tasks.containsKey(id)) {
             Task oldTask = tasks.remove(id);
-            if (!intersection(task)) {
+            if (!intersectionTaskTime(task)) {
                 tasks.put(id, task);
             } else {
                 tasks.put(id, oldTask);
@@ -87,7 +87,7 @@ public class InMemoryTaskManager implements TaskManager {
             SubTask oldSubTask = subTasks.remove(id);
             epic.deleteSubTask(id);
             updateEpicFields(epic);
-            if (!intersection(subTask)) {
+            if (!intersectionTaskTime(subTask)) {
                 subTasks.put(id, subTask);
                 updateEpicFields(epic);
             } else {
@@ -147,7 +147,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.addTaskInHistory(task);
             return task;
         }
-        throw new NotFoundException(id + " не соответсвует не одной из созданных задач");
+        throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
     }
 
     @Override
@@ -157,7 +157,7 @@ public class InMemoryTaskManager implements TaskManager {
             historyManager.addTaskInHistory(task);
             return epics.get(id);
         }
-        throw new NotFoundException(id + "не соответсвует не одномн из созданных Эпиков");
+        throw new NotFoundException(id + "не соответсвует ни одному из созданных Эпиков");
     }
 
     @Override
@@ -167,33 +167,45 @@ public class InMemoryTaskManager implements TaskManager {
         historyManager.addTaskInHistory(task);
         return subTasks.get(id);
     }
-        throw new NotFoundException(id + " не соответсвует не одной из созданных задач");
+        throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
     }
 
     //удалить задачу по id
     @Override
     public void deleteTaskById(int id) {
+        if (tasks.containsKey(id)) {
         historyManager.removeTaskFromHistory(id);
         tasks.remove(id);
+        } else {
+            throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
+        }
     }
 
     @Override
     public void deleteEpicById(int id) {
+        if (epics.containsKey(id)) {
         for (int i : epics.get(id).getIdSubTasks()) {
             historyManager.removeTaskFromHistory(i);
             subTasks.remove(i);
         }
         historyManager.removeTaskFromHistory(id);
         epics.remove(id);
+        } else {
+            throw new NotFoundException(id + "не соответсвует ни одному из созданных Эпиков");
+        }
     }
 
     @Override
     public void deleteSubTaskById(int id) {
+        if (subTasks.containsKey(id)) {
         SubTask subTask = subTasks.remove(id);
         final Epic epic = epics.get(subTask.getIdEpic());
         historyManager.removeTaskFromHistory(id);
         epic.deleteSubTask(id);
         updateEpicFields(epic);
+        } else {
+            throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
+        }
     }
 
     @Override
@@ -211,7 +223,7 @@ public class InMemoryTaskManager implements TaskManager {
         return setTask;
     }
 
-    protected boolean intersection(Task t1) {
+    protected boolean intersectionTaskTime(Task t1) {
         for (Task t2 : getPrioritizedTasks()) {
             if ((
                     t1.getStartTime().isBefore(t2.getStartTime()) ||
@@ -261,11 +273,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subTasks::get)
                 .map(Task::getStartTime)
                 .min(LocalDateTime::compareTo);
-
-        optional.ifPresentOrElse(
-                LocalDateTime -> epic.setStartTime(optional.get()),
-                () -> epic.setStartTime(null)
-        );
+        optional.ifPresent(epic::setStartTime);
     }
 
     protected void setEndTimeEpic(Epic epic) {
@@ -273,11 +281,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subTasks::get)
                 .map(Task::getEndTime)
                 .max(LocalDateTime::compareTo);
-
-        optional.ifPresentOrElse(
-                LocalDateTime -> epic.setEndTimeEpic(optional.get()),
-                () -> epic.setEndTimeEpic(null)
-        );
+        optional.ifPresent(epic::setEndTimeEpic);
     }
 
     protected void setDurationEpic(Epic epic) {

@@ -4,7 +4,6 @@ import com.sun.net.httpserver.HttpExchange;
 import com.yandex.app.model.Task;
 import com.yandex.app.service.TaskManager;
 
-import java.io.IOException;
 import java.util.List;
 
 public class HistoryHandler extends BaseHttpHandler {
@@ -13,7 +12,7 @@ public class HistoryHandler extends BaseHttpHandler {
     }
 
     @Override
-    public void handle(HttpExchange exchange) throws IOException {
+    public void handle(HttpExchange exchange) {
         method = exchange.getRequestMethod();
 
         if ("GET".equals(method)) {

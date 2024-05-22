@@ -124,4 +124,34 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
         assertEquals(Status.DONE, manager.getAllEpic().get(0).getStatus(), "Статус эпика расчитан неверно.");
     }
+
+    @Test
+    public void addEpicTimeTest() {
+        Epic epic1 = new Epic("Test Epic", "Test");//id = 1
+
+        SubTask subTask1 = new SubTask("Test subTask1", "Test",
+                Status.NEW, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 2, 0), 1); //id = 2
+
+        SubTask subTask2 = new SubTask("Test subTask1", "Test",
+                Status.IN_PROGRESS, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 4, 0), 1); //id = 3
+
+        SubTask subTask3 = new SubTask("Test subTask1", "Test",
+                Status.DONE, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 6, 0), 1); //id = 4
+
+        manager.putNewEpic(epic1);
+        manager.putNewSubTask(subTask1);
+        manager.putNewSubTask(subTask2);
+        manager.putNewSubTask(subTask3);
+
+        LocalDateTime start = epic1.getStartTime();
+        LocalDateTime end = epic1.getEndTime();
+
+        assertEquals(LocalDateTime.of(2024, 1, 1, 2, 0),
+                start, "Время начала выполнения эпика расчитано неверно.");
+        assertEquals(LocalDateTime.of(2024, 1, 1, 7, 30),
+                end, "Время завершения выполнения эпика расчитано неверно.");
+    }
 }
