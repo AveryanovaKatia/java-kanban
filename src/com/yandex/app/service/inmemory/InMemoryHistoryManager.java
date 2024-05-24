@@ -13,7 +13,7 @@ public class InMemoryHistoryManager implements HistoryManager {
     @Override
     public void addTaskInHistory(Task task) {
         // добаляет новую запись в хешмап
-        if (task != null) {
+        if (Objects.nonNull(task)) {
             int id = task.getId();
             if (!historyMap.isEmpty() && historyMap.containsKey(id)) {
                     removeTaskFromHistory(id);
@@ -27,7 +27,7 @@ public class InMemoryHistoryManager implements HistoryManager {
         //собирает все задачи в обычный ArrayList
         List<Task> list = new ArrayList<>();
         Node<Task> newNode = head;
-        while (newNode != null) {
+        while (Objects.nonNull(newNode)) {
             list.add(newNode.getData());
             newNode = newNode.getNext();
         }

@@ -6,19 +6,24 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.yandex.app.http.adapter.DurationAdapter;
 import com.yandex.app.http.adapter.LocalDateTimeAdapter;
+import com.yandex.app.model.Epic;
+import com.yandex.app.model.SubTask;
+import com.yandex.app.model.Task;
 import com.yandex.app.service.TaskManager;
 import com.yandex.app.service.exception.NotFoundException;
 
 import java.io.IOException;
 import java.time.Duration;
 import java.time.LocalDateTime;
-import java.util.Optional;
 
 public class BaseHttpHandler implements HttpHandler {
     protected final TaskManager taskManager;
     protected final Gson gson;
     protected String method;
-    int id;
+    protected int id;
+    protected Task newTask;
+    protected Epic newEpic;
+    protected SubTask newSubTask;
 
     public BaseHttpHandler(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -32,19 +37,57 @@ public class BaseHttpHandler implements HttpHandler {
     public void handle(HttpExchange exchange) throws IOException {
     }
 
-    protected Optional<Integer> getParameter(HttpExchange exchange) {
+    protected Endpoint getParameter(HttpExchange exchange) throws IOException {
+        method = exchange.getRequestMethod();
+
         String path = exchange.getRequestURI().getPath();
         String[] stringId = path.split("/");
-        if (stringId.length > 2) {
-            try {
-                int idTask = Integer.parseInt(stringId[2]);
-                return Optional.of(idTask);
-            } catch (NumberFormatException e) {
-                throw new NotFoundException("Идентификатор не является числом");
-            }
-        } else {
-            return Optional.empty();
+
+        switch (method) {
+            case "GET":
+                if (stringId.length > 2) {
+                    try {
+                        id = Integer.parseInt(stringId[2]);
+                        return Endpoint.GET_BY_ID;
+                    } catch (NumberFormatException e) {
+                        throw new NotFoundException("Идентификатор не является числом");
+                    }
+                } else {
+                    return Endpoint.GET;
+                }
+            case "POST":
+                if (stringId[1].equals("tasks")) {
+                    newTask = gson.fromJson(readText(exchange), Task.class);
+                    System.out.println(newTask);
+                    id = newTask.getId();
+                } else if (stringId[1].equals("epics")) {
+                    newEpic = gson.fromJson(readText(exchange), Epic.class);
+                    id = newEpic.getId();
+                } else if (stringId[1].equals("subTasks")) {
+                    newSubTask = gson.fromJson(readText(exchange), SubTask.class);
+                    id = newSubTask.getId();
+                }
+                if (id != 0) {
+                    return Endpoint.POST_BY_ID;
+                } else {
+                    return Endpoint.POST;
+                }
+            case "DELETE":
+                if (stringId.length > 2) {
+                    try {
+                        id = Integer.parseInt(stringId[2]);
+                        return Endpoint.DELETE_BY_ID;
+                    } catch (NumberFormatException e) {
+                        throw new NotFoundException("Идентификатор не является числом");
+                    }
+                } else {
+                    sendNotFound(exchange, "не был передан id для удаления");
+                }
+                break;
+            default:
+                sendNotFound(exchange, "Такого эндпоинта нет");
         }
+        return Endpoint.UNKNOWN;
     }
 
     protected String readText(HttpExchange exchange) throws IOException {
@@ -90,9 +133,9 @@ public class BaseHttpHandler implements HttpHandler {
         }
     }
 
-    public void sendHasInteractions(HttpExchange exchange, String text) {
+    protected void sendHasInteractions(HttpExchange exchange) {
         try {
-            byte[] resp = text.getBytes(TaskManager.DEFAULT_CHARSET);
+            byte[] resp = "Задача пересекается по времени".getBytes(TaskManager.DEFAULT_CHARSET);
             exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");
             exchange.sendResponseHeaders(406, resp.length);
             exchange.getResponseBody().write(resp);
@@ -103,7 +146,7 @@ public class BaseHttpHandler implements HttpHandler {
         }
     }
 
-    public void internalServerError(HttpExchange exchange, String text) {
+    protected void internalServerError(HttpExchange exchange, String text) {
         try {
             byte[] resp = text.getBytes(TaskManager.DEFAULT_CHARSET);
             exchange.getResponseHeaders().add("Content-Type", "application/json;charset=utf-8");

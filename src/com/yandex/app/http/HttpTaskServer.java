@@ -12,7 +12,9 @@ import java.net.InetSocketAddress;
 public class HttpTaskServer {
     private static final int PORT = 8080;
     private final TaskManager taskManager;
-    HttpServer httpServer;
+    private HttpServer httpServer;
+    private final static int DELAY = 1;
+
 
     public HttpTaskServer(TaskManager taskManager) {
         this.taskManager = taskManager;
@@ -36,7 +38,7 @@ public class HttpTaskServer {
     }
 
     public void stop() {
-        httpServer.stop(1);
+        httpServer.stop(DELAY);
         System.out.println("Сервер трекер задач остановлен");
     }
 }

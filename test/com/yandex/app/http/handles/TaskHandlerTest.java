@@ -23,9 +23,10 @@ public class TaskHandlerTest extends HttpTaskServerTest {
     public void getTaskTest() throws InterruptedException, IOException {
         Task task1 = new Task("Test1", "Test1", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
-        task1.setId(1);
+        //task1.setId(1);
         Task task2 = new Task("Test2", "Test2", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 2, 0));
+        //task2.setId(2);
 
         String taskJson1 = gson.toJson(task1);
         String taskJson2 = gson.toJson(task2);
@@ -35,9 +36,11 @@ public class TaskHandlerTest extends HttpTaskServerTest {
         HttpRequest request = HttpRequest.newBuilder().uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson1)).build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
+        task1.setId(1);
         request = HttpRequest.newBuilder().uri(url)
                 .POST(HttpRequest.BodyPublishers.ofString(taskJson2)).build();
         client.send(request, HttpResponse.BodyHandlers.ofString());
+        task2.setId(2);
 
         request = HttpRequest.newBuilder().uri(URI.create("http://localhost:8080/tasks/1")).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
