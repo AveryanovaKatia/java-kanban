@@ -13,7 +13,6 @@ public class HttpTaskServer {
     private static final int PORT = 8080;
     private final TaskManager taskManager;
     private HttpServer httpServer;
-    private final static int DELAY = 1;
 
 
     public HttpTaskServer(TaskManager taskManager) {
@@ -38,7 +37,8 @@ public class HttpTaskServer {
     }
 
     public void stop() {
-        httpServer.stop(DELAY);
+        int delay = 1;
+        httpServer.stop(delay);
         System.out.println("Сервер трекер задач остановлен");
     }
 }
