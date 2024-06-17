@@ -1,7 +1,10 @@
 package com.yandex.app.service;
 
 import com.yandex.app.model.*;
+import com.yandex.app.service.exception.NotFoundException;
 
+import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.format.DateTimeFormatter;
 
 import java.util.List;
@@ -9,6 +12,7 @@ import java.util.TreeSet;
 
 public interface TaskManager {
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy_HH:mm");
+    Charset DEFAULT_CHARSET = StandardCharsets.UTF_8;
 
     // добавть новую задачу
     void putNewTask(Task task);
@@ -39,7 +43,7 @@ public interface TaskManager {
     List<SubTask> getAllSubTask();
 
     //получить задачу по id
-    Task getTaskById(int id);
+    Task getTaskById(int id) throws NotFoundException;
 
     Epic getEpicById(int id);
 

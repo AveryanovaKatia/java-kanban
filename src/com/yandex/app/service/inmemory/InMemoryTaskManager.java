@@ -1,6 +1,11 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
 import com.yandex.app.model.*;
+import com.yandex.app.service.HistoryManager;
+import com.yandex.app.service.Managers;
+import com.yandex.app.service.TaskManager;
+import com.yandex.app.service.exception.IntersectionException;
+import com.yandex.app.service.exception.NotFoundException;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -18,10 +23,12 @@ public class InMemoryTaskManager implements TaskManager {
     // добавть новую задачу
     @Override
     public void putNewTask(Task task) {
-        if (!intersection(task)) {
+        if (!intersectionTaskTime(task)) {
             int id = makeId();
             task.setId(id);
             tasks.put(id, task);
+        } else {
+            throw new IntersectionException("Задача пересекается по времени с уже добавленными");
         }
     }
 
@@ -34,7 +41,7 @@ public class InMemoryTaskManager implements TaskManager {
 
     @Override
     public void putNewSubTask(SubTask subTask) {
-        if (!intersection(subTask)) {
+        if (!intersectionTaskTime(subTask)) {
             Epic epic = epics.get(subTask.getIdEpic());
             if (epic != null) {
                 int id = makeId();
@@ -43,6 +50,8 @@ public class InMemoryTaskManager implements TaskManager {
                 epic.addIdSubTasks(id);
                 updateEpicFields(epic);
             }
+        } else {
+            throw new IntersectionException("Задача пересекается по времени с уже добавленными");
         }
     }
 
@@ -52,10 +61,11 @@ public class InMemoryTaskManager implements TaskManager {
         int id = task.getId();
         if (tasks.containsKey(id)) {
             Task oldTask = tasks.remove(id);
-            if (!intersection(task)) {
+            if (!intersectionTaskTime(task)) {
                 tasks.put(id, task);
             } else {
                 tasks.put(id, oldTask);
+                throw new IntersectionException("Задача пересекается по времени с уже добавленными");
             }
         }
     }
@@ -63,7 +73,7 @@ public class InMemoryTaskManager implements TaskManager {
     @Override
     public void updateEpic(Epic epic) {
         Epic oldEpic = epics.get(epic.getId());
-        if (oldEpic != null) {
+        if (Objects.nonNull(oldEpic)) {
             oldEpic.setName(epic.getName());
             oldEpic.setDesc(epic.getDesc());
         }
@@ -77,12 +87,13 @@ public class InMemoryTaskManager implements TaskManager {
             SubTask oldSubTask = subTasks.remove(id);
             epic.deleteSubTask(id);
             updateEpicFields(epic);
-            if (!intersection(subTask)) {
+            if (!intersectionTaskTime(subTask)) {
                 subTasks.put(id, subTask);
                 updateEpicFields(epic);
             } else {
                 subTasks.put(id, oldSubTask);
                 updateEpicFields(epic);
+                throw new IntersectionException("Задача пересекается по времени с уже добавленными");
             }
         }
     }
@@ -130,50 +141,71 @@ public class InMemoryTaskManager implements TaskManager {
 
     //получить задачу по id
     @Override
-    public Task getTaskById(int id) {
-        Task task = tasks.get(id);
-        historyManager.addTaskInHistory(task);
-        return task;
+    public Task getTaskById(int id) throws NotFoundException {
+        if (tasks.containsKey(id)) {
+            Task task = tasks.get(id);
+            historyManager.addTaskInHistory(task);
+            return task;
+        }
+        throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
     }
 
     @Override
     public Epic getEpicById(int id) {
-        Task task = epics.get(id);
-        historyManager.addTaskInHistory(task);
-        return epics.get(id);
+        if (epics.containsKey(id)) {
+            Task task = epics.get(id);
+            historyManager.addTaskInHistory(task);
+            return epics.get(id);
+        }
+        throw new NotFoundException(id + "не соответсвует ни одному из созданных Эпиков");
     }
 
     @Override
     public SubTask getSubTaskById(int id) {
+        if (subTasks.containsKey(id)) {
         Task task = subTasks.get(id);
         historyManager.addTaskInHistory(task);
         return subTasks.get(id);
+    }
+        throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
     }
 
     //удалить задачу по id
     @Override
     public void deleteTaskById(int id) {
+        if (tasks.containsKey(id)) {
         historyManager.removeTaskFromHistory(id);
         tasks.remove(id);
+        } else {
+            throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
+        }
     }
 
     @Override
     public void deleteEpicById(int id) {
+        if (epics.containsKey(id)) {
         for (int i : epics.get(id).getIdSubTasks()) {
             historyManager.removeTaskFromHistory(i);
             subTasks.remove(i);
         }
         historyManager.removeTaskFromHistory(id);
         epics.remove(id);
+        } else {
+            throw new NotFoundException(id + "не соответсвует ни одному из созданных Эпиков");
+        }
     }
 
     @Override
     public void deleteSubTaskById(int id) {
+        if (subTasks.containsKey(id)) {
         SubTask subTask = subTasks.remove(id);
         final Epic epic = epics.get(subTask.getIdEpic());
         historyManager.removeTaskFromHistory(id);
         epic.deleteSubTask(id);
         updateEpicFields(epic);
+        } else {
+            throw new NotFoundException(id + " не соответсвует ни одной из созданных задач");
+        }
     }
 
     @Override
@@ -191,7 +223,7 @@ public class InMemoryTaskManager implements TaskManager {
         return setTask;
     }
 
-    protected boolean intersection(Task t1) {
+    protected boolean intersectionTaskTime(Task t1) {
         for (Task t2 : getPrioritizedTasks()) {
             if ((
                     t1.getStartTime().isBefore(t2.getStartTime()) ||
@@ -241,11 +273,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subTasks::get)
                 .map(Task::getStartTime)
                 .min(LocalDateTime::compareTo);
-
-        optional.ifPresentOrElse(
-                LocalDateTime -> epic.setStartTime(optional.get()),
-                () -> epic.setStartTime(null)
-        );
+        optional.ifPresent(epic::setStartTime);
     }
 
     protected void setEndTimeEpic(Epic epic) {
@@ -253,11 +281,7 @@ public class InMemoryTaskManager implements TaskManager {
                 .map(subTasks::get)
                 .map(Task::getEndTime)
                 .max(LocalDateTime::compareTo);
-
-        optional.ifPresentOrElse(
-                LocalDateTime -> epic.setEndTimeEpic(optional.get()),
-                () -> epic.setEndTimeEpic(null)
-        );
+        optional.ifPresent(epic::setEndTimeEpic);
     }
 
     protected void setDurationEpic(Epic epic) {

@@ -1,7 +1,10 @@
-package com.yandex.app.service;
+package com.yandex.app.service.inmemory;
 
 import com.yandex.app.model.*;
 
+import com.yandex.app.service.Managers;
+import com.yandex.app.service.TaskManagerTest;
+import com.yandex.app.service.exception.NotFoundException;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -24,7 +27,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     // InMemoryTaskManager действительно добавляет задачи разного типа и может найти их по id;
     @Test
-    public void inMemoryTaskManagerCanAddAnyTaskTest() {
+    public void inMemoryTaskManagerCanAddAnyTaskTest() throws NotFoundException {
         Task task1 = new Task("Test addNewTask", "Test addNewTask description", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         manager.putNewTask(task1); //id = 1
@@ -69,7 +72,7 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
 
     // неизменность задачи (по всем полям) при добавлении задачи в менеджер
     @Test
-    public void taskShouldBeSOKThenAddInInMemoryTaskManagerTest() {
+    public void taskShouldBeSOKThenAddInInMemoryTaskManagerTest() throws NotFoundException {
         Task task = new Task("Test addNewTask", "Test addNewTask description", Status.NEW,
                 "PT1H30M", LocalDateTime.of(2024, 1, 1, 0, 0));
         manager.putNewTask(task);
@@ -110,7 +113,8 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         assertEquals(Status.IN_PROGRESS, manager.getAllEpic().get(0).getStatus(),
                 "Статус эпика расчитан неверно.");
 
-        manager.putNewSubTask(subTask3);
+//        manager.putNewSubTask(subTask3);
+//        так же пересечение
 
         assertEquals(Status.IN_PROGRESS, manager.getAllEpic().get(0).getStatus(),
                 "Статус эпика расчитан неверно.");
@@ -119,5 +123,35 @@ public class InMemoryTaskManagerTest extends TaskManagerTest<InMemoryTaskManager
         manager.putNewSubTask(subTask3);
 
         assertEquals(Status.DONE, manager.getAllEpic().get(0).getStatus(), "Статус эпика расчитан неверно.");
+    }
+
+    @Test
+    public void addEpicTimeTest() {
+        Epic epic1 = new Epic("Test Epic", "Test");//id = 1
+
+        SubTask subTask1 = new SubTask("Test subTask1", "Test",
+                Status.NEW, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 2, 0), 1); //id = 2
+
+        SubTask subTask2 = new SubTask("Test subTask1", "Test",
+                Status.IN_PROGRESS, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 4, 0), 1); //id = 3
+
+        SubTask subTask3 = new SubTask("Test subTask1", "Test",
+                Status.DONE, "PT1H30M",
+                LocalDateTime.of(2024, 1, 1, 6, 0), 1); //id = 4
+
+        manager.putNewEpic(epic1);
+        manager.putNewSubTask(subTask1);
+        manager.putNewSubTask(subTask2);
+        manager.putNewSubTask(subTask3);
+
+        LocalDateTime start = epic1.getStartTime();
+        LocalDateTime end = epic1.getEndTime();
+
+        assertEquals(LocalDateTime.of(2024, 1, 1, 2, 0),
+                start, "Время начала выполнения эпика расчитано неверно.");
+        assertEquals(LocalDateTime.of(2024, 1, 1, 7, 30),
+                end, "Время завершения выполнения эпика расчитано неверно.");
     }
 }

@@ -1,5 +1,8 @@
 package com.yandex.app.service;
 
+import com.yandex.app.service.inmemory.InMemoryHistoryManager;
+import com.yandex.app.service.inmemory.InMemoryTaskManager;
+
 public class Managers {
     private Managers() {
     }
